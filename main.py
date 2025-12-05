@@ -1,7 +1,7 @@
 import os
 import time
 
-
+users = []
 patients = []
 doctors = []
 appointments = []
@@ -9,6 +9,7 @@ appointments = []
 
 def createUser(name, age, gender, tel, address):
     newUser = {
+        "id": len(users),
         "name": name,
         "age": age,
         "gender": gender,
@@ -20,7 +21,79 @@ def createUser(name, age, gender, tel, address):
     return newUser
 
 
+def createAppointment(patientName, doctorName, date):
+    newAppointment = {
+        "id": len(appointments),
+        "patientName": patientName,
+        "doctorName": doctorName,
+        "date": date
+    }
+    return newAppointment
+
+def listPatients():
+    print("Usuários cadastrados:")
+    for i, patient in enumerate(patients):
+        print(
+            f"{i + 1}. Nome: {patient['name']}, Idade: {patient['age']}, Gênero: {patient['gender']}"
+        )
+
+def listDoctors():
+    print("Médicos cadastrados:")
+    for i, doctor in enumerate(doctors):
+        print(
+            f"{i + 1}. Nome: {doctor['name']}, Idade: {doctor['age']}, Gênero: {doctor['gender']}"
+        )
+
+def listAppointments():
+    print("Consultas cadastradas:")
+    for i, appointment in enumerate(appointments):
+        print(
+            f"{i + 1}. Paciente: {appointment['patientName']}, Médico: {appointment['doctorName']}, Data: {appointment['date']}"
+        )
+
+def askForAppointmentInfo():
+    os.system("cls" if os.name == "nt" else "clear")
+    patientName = ''
+    doctorName = ''
+    if len(patients) == 0:
+        print('Nenhum paciente cadastrado.')
+        op = input('Digite ENTER para voltar ao menu.')
+        return
+    if len(doctors) == 0:
+        print('Nenhum médico cadastrado.')
+        op = input('Digite ENTER para voltar ao menu.')
+        return
+        
+
+    listPatients()
+    selectedPatient = input('Digite o nome do paciente que vai consultar: ')
+    for i in patients:
+        if i['name'] == selectedPatient:
+            patientName = i['name']
+    if not patientName:
+        print('Paciente não encontrado...')
+        op = input('Digite ENTER para voltar ao menu.')
+        return
+    
+    listDoctors()
+    selectedDoctor = input('Digite o nome do médico que vai realizar o atendimento da consulta: ')
+    
+    for i in doctors:
+        if i['name'] == selectedDoctor:
+            doctorName = i['name']
+    if not doctorName:
+        print('Médico não encontrado...')
+        op = input('Digite ENTER para voltar ao menu.')
+        return
+    
+    appointmentDate = input('Digite a data da consulta ( dd/mm/yyyy ): ')
+    
+    newAppointment = createAppointment(selectedPatient, selectedDoctor, appointmentDate)
+    return newAppointment
+
+
 def askForInfo(type):
+    os.system("cls" if os.name == "nt" else "clear")
     name = input("Informe o nome do " + type + ": ")
     age = int(input("Informe a idade do " + type + ": "))
     gender = input("Informe o gênero do " + type + ": ")
@@ -35,12 +108,7 @@ def RemoveAppointment():
         print("Nenhuma consulta cadastrada.")
         return
 
-    print("Consultas cadastradas:")
-    for i, appointment in enumerate(appointments):
-        print(
-            f"{i + 1}. Paciente: {appointment['patientName']}, Médico: {appointment['doctorName']}, Data: {appointment['date']}"
-        )
-
+    listAppointments()
     index = int(input("Informe o número da consulta que deseja excluir: ")) - 1
 
     if 0 <= index < len(appointments):
@@ -58,12 +126,7 @@ def RemovePatients():
         print("Nenhum usuário cadastrado.")
         return
 
-    print("Usuários cadastrados:")
-    for i, patient in enumerate(patients):
-        print(
-            f"{i + 1}. Nome: {patient['name']}, Idade: {patient['age']}, Gênero: {patient['gender']}"
-        )
-
+    listPatients()
     index = int(input("Informe o número do usuário que deseja excluir: ")) - 1
 
     if 0 <= index < len(patients):
@@ -79,11 +142,7 @@ def RemoveDoctor():
         print("Nenhum médico cadastrado.")
         return
 
-    print("Médicos cadastrados:")
-    for i, doctor in enumerate(doctors):
-        print(
-            f"{i + 1}. Nome: {doctor['name']}, Idade: {doctor['age']}, Gênero: {doctor['gender']}"
-        )
+    listDoctors()
     index = int(input("Informe o número do medico que deseja excluir: ")) - 1
 
     if 0 <= index < len(doctors):
@@ -98,6 +157,7 @@ def RemoveDoctor():
 def appointmentsActionsMenu():
     op = 0
     while op != 5:
+        os.system("cls" if os.name == "nt" else "clear")
         print(
             "\n\n====== SISTEMA HOSPITALAR - IFRS ======\n"
             "====== MENU DE CONSULTAS ======\n\n"
@@ -112,14 +172,17 @@ def appointmentsActionsMenu():
 
         if op == 1:
             # TODO
-            print("")
+            newAppointment = askForAppointmentInfo()
+            appointments.append(newAppointment)
         elif op == 2:
-            # TODO
-            print("")
+            os.system("cls" if os.name == "nt" else "clear")
+            listAppointments()
+            op = input("Pressione ENTER para voltar... ")
         elif op == 3:
             # TODO
             print("")
         elif op == 4:
+            os.system("cls" if os.name == "nt" else "clear")
             print("Acessando exclusão de consulta...")
             RemoveAppointment()
         elif op == 5:
@@ -130,6 +193,7 @@ def doctorActionsMenu():
     op = ""
 
     while op != 5:
+        os.system("cls" if os.name == "nt" else "clear")
         print(
             "\n\n====== SISTEMA HOSPITALAR - IFRS ======\n"
             "====== MENU DE MÉDICOS ======\n\n"
@@ -145,9 +209,11 @@ def doctorActionsMenu():
         if op == 1:
             newDoctor = askForInfo("médico")
             doctors.append(newDoctor)
+            users.append(newDoctor)
         elif op == 2:
-            # TODO
-            print("")
+            os.system("cls" if os.name == "nt" else "clear")
+            listDoctors()
+            op = input("Pressione ENTER para voltar... ")
         elif op == 3:
             # TODO
             print("")
@@ -162,6 +228,7 @@ def pacientActionsMenu():
     op = ""
 
     while op != 5:
+        os.system("cls" if os.name == "nt" else "clear")
         print(
             "\n\n====== SISTEMA HOSPITALAR - IFRS ======\n"
             "====== MENU DE PACIENTES ======\n\n"
@@ -177,9 +244,11 @@ def pacientActionsMenu():
         if op == 1:
             newPatient = askForInfo("paciente")
             patients.append(newPatient)
+            users.append(newPatient)
         elif op == 2:
-            # TODO
-            print("")
+            os.system("cls" if os.name == "nt" else "clear")
+            listPatients()
+            op = input("Pressione ENTER para voltar... ")
         elif op == 3:
             # TODO
             print("")
